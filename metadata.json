@@ -1,0 +1,7 @@
+{
+  "name": "Waste Segregation Helper",
+  "description": "An intelligent waste segregation assistant that identifies waste from images and provides recycling tips.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
