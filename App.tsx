@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { History, Home, Settings, Trash2, Lightbulb } from 'lucide-react';
+import { History, Home, Settings, Trash2, Lightbulb, X } from 'lucide-react';
 import CameraCapture from './components/CameraCapture';
 import AnalysisResult from './components/AnalysisResult';
 import HistoryChart from './components/HistoryChart';
@@ -66,8 +66,14 @@ const App: React.FC = () => {
   };
 
   const clearHistory = () => {
-    if (confirm("Are you sure you want to clear your scan history?")) {
+    if (window.confirm("Are you sure you want to clear your entire scan history?")) {
       setHistory([]);
+    }
+  };
+
+  const deleteScan = (id: string) => {
+    if (window.confirm("Delete this scan record?")) {
+      setHistory(prev => prev.filter(scan => scan.id !== id));
     }
   };
 
@@ -86,8 +92,12 @@ const App: React.FC = () => {
             <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
               <h3 className="font-semibold text-gray-700">Recent Scans</h3>
               {history.length > 0 && (
-                <button onClick={clearHistory} className="text-red-500 hover:text-red-600 p-1">
-                  <Trash2 className="w-4 h-4" />
+                <button 
+                  onClick={clearHistory} 
+                  className="text-red-500 hover:text-red-700 hover:bg-red-50 px-3 py-1.5 rounded-full text-xs font-medium flex items-center transition-colors"
+                >
+                  <Trash2 className="w-3.5 h-3.5 mr-1.5" />
+                  Clear All
                 </button>
               )}
             </div>
@@ -96,18 +106,27 @@ const App: React.FC = () => {
                 <div className="p-8 text-center text-gray-400 text-sm">No history available</div>
               ) : (
                 history.map((scan) => (
-                  <div key={scan.id} className="p-4 hover:bg-gray-50 transition-colors">
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="text-xs text-gray-400">{new Date(scan.timestamp).toLocaleString()}</span>
-                      <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-                        {scan.items.length} item{scan.items.length !== 1 ? 's' : ''}
-                      </span>
+                  <div key={scan.id} className="p-4 hover:bg-gray-50 transition-colors relative group">
+                    <div className="flex justify-between items-start mb-2 pr-6">
+                      <div className="flex flex-col">
+                        <span className="text-xs text-gray-400">{new Date(scan.timestamp).toLocaleString()}</span>
+                        <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full mt-1 w-fit">
+                          {scan.items.length} item{scan.items.length !== 1 ? 's' : ''}
+                        </span>
+                      </div>
+                      <button 
+                        onClick={() => deleteScan(scan.id)}
+                        className="absolute top-3 right-3 p-2 text-gray-300 hover:text-red-500 transition-colors"
+                        aria-label="Delete scan"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1 mt-2">
                         {scan.items.map((item, idx) => (
                            <div key={idx} className="flex justify-between items-center text-sm">
-                              <span className="text-gray-700">{item.itemName}</span>
-                              <span className={`text-[10px] px-1.5 py-0.5 rounded border ${
+                              <span className="text-gray-700 truncate max-w-[60%]">{item.itemName}</span>
+                              <span className={`text-[10px] px-1.5 py-0.5 rounded border whitespace-nowrap ${
                                 item.category.includes('Bio') ? 'bg-green-50 text-green-700 border-green-200' :
                                 item.category.includes('Recycle') ? 'bg-blue-50 text-blue-700 border-blue-200' :
                                 'bg-gray-50 text-gray-700 border-gray-200'
