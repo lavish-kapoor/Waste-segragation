@@ -1,7 +1,9 @@
 import { GoogleGenAI } from "@google/genai";
 import { ScanResult, WasteItem, WasteCategory } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Use Vite's import.meta.env for environment variables
+const apiKey = import.meta.env.VITE_API_KEY || '';
+const ai = new GoogleGenAI({ apiKey });
 
 const SYSTEM_PROMPT = `
 You are an expert waste management assistant. Your goal is to identify ALL distinct waste objects in the provided image.
@@ -33,6 +35,10 @@ Structure:
 `;
 
 export const analyzeWasteImage = async (base64Image: string): Promise<Omit<ScanResult, 'id' | 'timestamp'>> => {
+  if (!apiKey) {
+    throw new Error("API Key is missing. Please check your configuration.");
+  }
+
   try {
     const modelId = 'gemini-3-flash-preview';
     const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, "");
