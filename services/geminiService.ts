@@ -1,9 +1,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { ScanResult, WasteItem, WasteCategory } from "../types";
 
-// Initialize GoogleGenAI with process.env.API_KEY as per guidelines
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 const PROMPT = `
 You are an expert waste management assistant. Your goal is to identify ALL distinct waste objects in the provided image.
 For EACH item identified, provide the details as per the schema.
@@ -11,7 +8,16 @@ Category must be one of: Biodegradable, Recyclable, Non-Recyclable, Hazardous, E
 `;
 
 export const analyzeWasteImage = async (base64Image: string): Promise<Omit<ScanResult, 'id' | 'timestamp'>> => {
-  // process.env.API_KEY is assumed to be pre-configured and valid.
+  // Access the key safely inside the function.
+  // This ensures the app can load even if the key is missing (e.g. during first deploy).
+  const apiKey = process.env.API_KEY;
+
+  if (!apiKey) {
+    throw new Error("API Key is missing. Please check your Vercel Environment Variables.");
+  }
+
+  // Initialize the client here to prevent module-level crashes
+  const ai = new GoogleGenAI({ apiKey });
 
   try {
     const modelId = 'gemini-3-flash-preview';
@@ -69,7 +75,7 @@ export const analyzeWasteImage = async (base64Image: string): Promise<Omit<ScanR
     const parsed = JSON.parse(text);
 
     if (!parsed.items || !Array.isArray(parsed.items)) {
-       // Fallback if model returns unexpected structure (though schema should prevent this)
+       // Fallback if model returns unexpected structure
        if (parsed.itemName) {
            parsed.items = [parsed];
        } else {
@@ -102,6 +108,6 @@ export const analyzeWasteImage = async (base64Image: string): Promise<Omit<ScanR
 
   } catch (error) {
     console.error("Gemini Analysis Error:", error);
-    throw new Error("Failed to analyze the image. Please try again.");
+    throw error;
   }
 };
