@@ -1,43 +1,17 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { ScanResult, WasteItem, WasteCategory } from "../types";
 
-// Use Vite's import.meta.env for environment variables
-const apiKey = import.meta.env.VITE_API_KEY || '';
-const ai = new GoogleGenAI({ apiKey });
+// Initialize GoogleGenAI with process.env.API_KEY as per guidelines
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-const SYSTEM_PROMPT = `
+const PROMPT = `
 You are an expert waste management assistant. Your goal is to identify ALL distinct waste objects in the provided image.
-For EACH item identified, provide the following details:
-
-1. itemName: A short, descriptive name (e.g., "Plastic Water Bottle", "Apple Core").
-2. material: The primary material (e.g., Plastic, Paper, Glass, Metal, Organic, Electronic).
-3. category: Must be one of [Biodegradable, Recyclable, Non-Recyclable, Hazardous, E-Waste].
-4. confidence: A number between 0 and 1.
-5. disposalInstruction: A concise sentence on proper disposal.
-6. recyclingTips: A list of 2 short tips.
-7. funFact: A short interesting fact.
-
-RETURN ONLY RAW JSON. The JSON must have a root property "items" which is an array.
-Structure:
-{
-  "items": [
-    {
-      "itemName": "string",
-      "material": "string",
-      "category": "string",
-      "confidence": number,
-      "disposalInstruction": "string",
-      "recyclingTips": ["string"],
-      "funFact": "string"
-    }
-  ]
-}
+For EACH item identified, provide the details as per the schema.
+Category must be one of: Biodegradable, Recyclable, Non-Recyclable, Hazardous, E-Waste.
 `;
 
 export const analyzeWasteImage = async (base64Image: string): Promise<Omit<ScanResult, 'id' | 'timestamp'>> => {
-  if (!apiKey) {
-    throw new Error("API Key is missing. Please check your configuration.");
-  }
+  // process.env.API_KEY is assumed to be pre-configured and valid.
 
   try {
     const modelId = 'gemini-3-flash-preview';
@@ -54,22 +28,52 @@ export const analyzeWasteImage = async (base64Image: string): Promise<Omit<ScanR
             },
           },
           {
-            text: SYSTEM_PROMPT,
+            text: PROMPT,
           },
         ],
       },
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            items: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  itemName: { type: Type.STRING },
+                  material: { type: Type.STRING },
+                  category: { type: Type.STRING },
+                  confidence: { type: Type.NUMBER },
+                  disposalInstruction: { type: Type.STRING },
+                  recyclingTips: { 
+                    type: Type.ARRAY,
+                    items: { type: Type.STRING }
+                  },
+                  funFact: { type: Type.STRING }
+                },
+                required: ['itemName', 'material', 'category', 'confidence', 'disposalInstruction', 'recyclingTips']
+              }
+            }
+          }
+        }
+      }
     });
 
-    const text = response.text || "{}";
-    const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim();
-    const parsed = JSON.parse(jsonString);
+    const text = response.text;
+    if (!text) {
+      throw new Error("Empty response from Gemini");
+    }
+
+    const parsed = JSON.parse(text);
 
     if (!parsed.items || !Array.isArray(parsed.items)) {
-       // Fallback if model returns single object instead of array structure
+       // Fallback if model returns unexpected structure (though schema should prevent this)
        if (parsed.itemName) {
            parsed.items = [parsed];
        } else {
-           throw new Error("Invalid response structure");
+           return { items: [] };
        }
     }
 

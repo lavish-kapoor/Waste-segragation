@@ -158,7 +158,10 @@ const App: React.FC = () => {
              </p>
              <div className="pt-4 border-t border-gray-100">
                 <h4 className="font-semibold text-emerald-800 mb-2">Credits</h4>
-                <p className="text-sm text-gray-500">Powered by Google Gemini API</p>
+                
+                <p className="text-sm text-gray-500">Lavish Kapoor</p>
+                <p className="text-sm text-gray-500">Saksham Bansal</p>
+                <p className="text-sm text-gray-500">Annanya Vig</p>
              </div>
            </div>
          </div>
