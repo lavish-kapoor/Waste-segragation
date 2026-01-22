@@ -161,7 +161,7 @@ const App: React.FC = () => {
                 
                 <p className="text-sm text-gray-500">Lavish Kapoor</p>
                 <p className="text-sm text-gray-500">Saksham Bansal</p>
-                <p className="text-sm text-gray-500">Annanya Vig</p>
+                <p className="text-sm text-gray-500">Ananya Vig</p>
              </div>
            </div>
          </div>
