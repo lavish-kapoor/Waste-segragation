@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { History, Home, Settings, Trash2, Lightbulb, X } from 'lucide-react';
+import { Analytics } from '@vercel/analytics/react';
 import CameraCapture from './components/CameraCapture';
 import AnalysisResult from './components/AnalysisResult';
 import HistoryChart from './components/HistoryChart';
@@ -235,6 +236,7 @@ const App: React.FC = () => {
           </button>
         </nav>
       </div>
+      <Analytics />
     </div>
   );
 };
