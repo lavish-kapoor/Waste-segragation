@@ -4,7 +4,7 @@
 
 This contains everything you need to run your app locally.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1roqSUqwrBzkvjGBwZ5y07-Rl6kXzqQD2
+View our app : https://team-spark-waste-segragation.vercel.app/
 
 ## Run Locally
 
