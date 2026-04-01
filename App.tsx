@@ -151,7 +151,7 @@ const App: React.FC = () => {
            <h2 className="text-2xl font-bold text-emerald-900 mb-6">About Waste Segregation Helper</h2>
            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-4">
              <p className="text-gray-600 leading-relaxed">
-               Waste Segregation Helper uses advanced AI (Google Gemini) to identify waste items and provide instant segregation advice.
+               Waste Segregation Helper uses advanced AI to identify waste items and provide instant segregation advice.
              </p>
              <p className="text-gray-600 leading-relaxed">
                Proper waste segregation reduces landfill mass, prevents pollution, and conserves resources.
@@ -160,8 +160,8 @@ const App: React.FC = () => {
                 <h4 className="font-semibold text-emerald-800 mb-2">Credits</h4>
                 
                 <p className="text-sm text-gray-500">Lavish Kapoor</p>
-                <p className="text-sm text-gray-500">Saksham Bansal</p>
-                <p className="text-sm text-gray-500">Ananya Vig</p>
+                <p className="text-sm text-gray-500"></p>
+                <p className="text-sm text-gray-500"></p>
              </div>
            </div>
          </div>
